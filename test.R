@@ -147,6 +147,7 @@ bp<- ggplot(data = cvmsfe.dat)+geom_point(aes(x=c(-1:-163),y=V1,colour='Lag1'))+
 
 Ipaper::write_fig(bp,file = "graphs\\msfe.pdf")
 
+
 ##########plot end #################
 # delete the last const value of perdict vector
 betacv<- result2@betaPred
@@ -193,7 +194,8 @@ res<- result2@resids
 plot(res[1:476,21])
 x <- c(1:476)
 y <- res[1:476,21]
-ggplot(data= NULL,aes(x = x, y = y))+geom_point(color = "darkred")+xlab("观测次数")+ylab("残差大小")+ggtitle("调整观测值回归结果")
+resplot<- ggplot(data= NULL,aes(x = x, y = y))+geom_point(color = "darkred")+xlab("observations")+ylab("residuals")+ggtitle("VAR results")
+Ipaper::write_fig(resplot,file = "graphs\\resplot.pdf")
 
 
 # take zero point as centre
@@ -335,15 +337,35 @@ igraph::plot.igraph(ig5,layout=layout5)
 E(ig5)$width <- E(ig5)$weight*30 + min(E(ig5)$weight)*1+ 1 # offset=1
 #igraph::plot.igraph(ig4, layout=layout_on_grid(ig4, dim=2))
 igraph::plot.igraph(ig5,layout=layout5)
+dev.off()
+pdf("graphs\\ig5without_largeness.pdf")
+igraph::plot.igraph(ig5,layout=layout5)
+dev.off()
 
 
 
 
 
+#wrong and waited to be corrected
 member<-spinglass.community(ig5,weights=E(ig5)$weight,spins=2)  
+
+#correction of above
+##########
+weights=E(ig5)$weight
+giant       = clusters.giant(weights) ## using the biggest component as an example, you can use the others here.
+communities = giant.community_spinglass()
+
+
+
+
+
+##########
 
 plot(ig5,edge.arrow.size=0.1 ,vertex.label.dist=0,layout=layout5,vertex.color=rainbow(7,alpha=0.3),edge.arrow.mode = "-") 
 
+pdf("graphs\\ig5with_largeness.pdf")
+igraph::plot.igraph(ig5,layout=layout5,edge.arrow.size=0.1 ,vertex.label.dist=0,layout=layout5,vertex.color=rainbow(7,alpha=0.3),edge.arrow.mode = "-")
+dev.off()
 
 
 
@@ -365,6 +387,7 @@ V(ig5)[degree(ig5)>=1]$size = 15
 #设置不同社群颜色
 mem.col<-rainbow(length(unique(V(ig5)$member)),alpha = 0.3)  
 V(ig5)$color<-mem.col[V(ig5)$member]  
+
 
 svg(filename=paste("C:/Users/long/Desktop","/1.svg",sep = ""),width = 40,height = 40)  
 plot(ig5,layout=layout5,vertex.color=V(ig5)$color,vertex.label=V(ig5)$label,vertex.size=V(ig5)$size,edge.arrow.mode = "-")  
@@ -391,6 +414,54 @@ stargazer::stargazer(std.thetaH.10,title='Connectedness of SSE50 stocks \'s vola
 
 
 
+#################################
+########################
+########################
+
+ig4 <- graph.adjacency(std.thetaH.10,mode="undirected", weighted=TRUE)
+layout4 <- layout.forceatlas2(ig4,directed=FALSE,iterations = 110, plotstep = 100)
+igraph::plot.igraph(ig4,layout=layout4)
+E(ig4)$width <- E(ig4)$weight*30 + min(E(ig4)$weight)*1+ 1 # offset=1
+#igraph::plot.igraph(ig4, layout=layout_on_grid(ig4, dim=2))
+igraph::plot.igraph(ig4,layout=layout4)
+member<-spinglass.community(ig4,weights=E(ig4)$weight,spins=10)  
+
+layout4 <- layout.forceatlas2(ig4,directed=TRUE,iterations = 110, plotstep = 100)
+igraph::plot.igraph(ig5,layout=layout4)
+dev.off()
+E(ig5)$width <- E(ig5)$weight*30 + min(E(ig5)$weight)*1+ 1 # offset=1
+#igraph::plot.igraph(ig4, layout=layout_on_grid(ig4, dim=2))
+igraph::plot.igraph(ig4,layout=layout5)
+dev.off()
 
 
 
+plot(ig4,edge.arrow.size=0.1 ,vertex.label.dist=0,layout=layout5,vertex.color=rainbow(7,alpha=0.3),edge.arrow.mode = "-") 
+
+
+
+
+
+######
+plot.membership<-function(graph,membership,main=""){  
+  V(graph)$member<-membership  
+  mem.col<-rainbow(length(unique(membership)),alpha=0.3)  
+  V(graph)$color<-mem.col[membership]  
+  plot(graph,edge.width=E(graph)$weight,vertex.color=V(graph)$color,main=main)  
+}  
+#neighborhood
+pdf("graphs\\ig4with_neighborhoods.pdf")
+plot.membership(ig4,clusters(ig4)$membership,"Neighborhood finding of Stocks")  
+dev.off()
+#设置点大小
+V(ig4)$size = 15  
+V(ig4)[degree(ig5)>=1]$size = 15  
+
+#设置不同社群颜色
+mem.col<-rainbow(length(unique(V(ig5)$member)),alpha = 0.3)  
+V(ig4)$color<-mem.col[V(ig4)$member]  
+
+dev.off()
+pdf("graphs\\ig4withlayout.pdf") 
+plot(ig4,layout=layout5,vertex.color=V(ig4)$color,vertex.label=V(ig4)$label,vertex.size=V(ig4)$size,edge.arrow.mode = "-")  
+dev.off() 
