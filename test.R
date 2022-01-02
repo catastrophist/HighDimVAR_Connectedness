@@ -131,17 +131,17 @@ cvmsfe.dat<- as.data.frame(cvmsfe)
 #  geom_point(aes(x=c(1:163),y=V6))+geom_point(aes(x=c(1:163),y=V7))+geom_point(aes(x=c(1:163),y=V8))+
 #  geom_point(aes(x=c(1:163),y=V9))+geom_point(aes(x=c(1:163),y=V10))
 
-bp<- ggplot(data = cvmsfe.dat)+geom_point(aes(x=c(-1:-163),y=V1,colour='Lag1'))+
-  geom_point(aes(x=c(-1:-163),y=V2,colour='Lag2'))+
-  geom_point(aes(x=c(-1:-163),y=V3,colour='Lag3'))+
-  geom_point(aes(x=c(-1:-163),y=V4,colour='Lag4'))+
-  geom_point(aes(x=c(-1:-163),y=V5,colour='Lag5'))+
-  geom_point(aes(x=c(-1:-163),y=V6,colour='Lag6'))+
-  geom_point(aes(x=c(-1:-163),y=V7,colour='Lag7'))+
-  geom_point(aes(x=c(-1:-163),y=V8,colour='Lag8'))+
-  geom_point(aes(x=c(-1:-163),y=V9,colour='Lag9'))+
-  geom_point(aes(x=c(-1:-163),y=V10,colour='Lag10'))+ 
-  ggtitle('Training loss in validation')+
+bp<- ggplot(data = cvmsfe.dat)+geom_point(aes(x=c(1:163),y=V1,colour='Lag1'))+
+  geom_point(aes(x=c(1:163),y=V2,colour='Lag2'))+
+  geom_point(aes(x=c(1:163),y=V3,colour='Lag3'))+
+  geom_point(aes(x=c(1:163),y=V4,colour='Lag4'))+
+  geom_point(aes(x=c(1:163),y=V5,colour='Lag5'))+
+  geom_point(aes(x=c(1:163),y=V6,colour='Lag6'))+
+  geom_point(aes(x=c(1:163),y=V7,colour='Lag7'))+
+  geom_point(aes(x=c(1:163),y=V8,colour='Lag8'))+
+  geom_point(aes(x=c(1:163),y=V9,colour='Lag9'))+
+  geom_point(aes(x=c(1:163),y=V10,colour='Lag10'))+ 
+  ggtitle('Training loss in validation for different lag period')+
   ylab('MSFE')+xlab('period')+scale_color_discrete(breaks=c('Lag1','Lag2','Lag3','Lag4',
   'Lag5','Lag6','Lag7','Lag8','Lag9','Lag10'))
 
@@ -401,17 +401,17 @@ svg(filename='sample1.svg',width = 40,height = 40)
 
 
 
-
-colnames(dfssl) <- toutou
-
-stargazer::stargazer(dfssl,label=toutou,summary=TRUE,title='Basic informations of SSE50 stocks \'svolatility ')
+##############################################################################
+colnames(dfssl) <- touhou[1:46]
+###############################################################################
+stargazer::stargazer(dfssl,label=touhou,summary=TRUE,title='Basic informations of SSE50 stocks \'svolatility ')
 
 stargazer::stargazer(std.thetaH.10)
-
+stargazer::stargazer(shrink1.std.thetaH.10ij,summary=TRUE)
 colnames(std.thetaH.10) <- toutou
 row.names(std.thetaH.10) <- toutou
-stargazer::stargazer(std.thetaH.10,title='Connectedness of SSE50 stocks \'s volatility ')
-
+stargazer::stargazer(std.thetaH.10,type='text',title='Connectedness of SSE50 stocks \'s volatility ')
+stargazer::stargazer(shrink1.std.thetaH.10ij,type='text',title='Connectedness of SSE50 stocks \'s volatility ')
 
 
 #################################
@@ -426,18 +426,19 @@ E(ig4)$width <- E(ig4)$weight*30 + min(E(ig4)$weight)*1+ 1 # offset=1
 igraph::plot.igraph(ig4,layout=layout4)
 member<-spinglass.community(ig4,weights=E(ig4)$weight,spins=10)  
 
+
+
 layout4 <- layout.forceatlas2(ig4,directed=TRUE,iterations = 110, plotstep = 100)
 igraph::plot.igraph(ig5,layout=layout4)
 dev.off()
 E(ig5)$width <- E(ig5)$weight*30 + min(E(ig5)$weight)*1+ 1 # offset=1
 #igraph::plot.igraph(ig4, layout=layout_on_grid(ig4, dim=2))
-igraph::plot.igraph(ig4,layout=layout5)
+igraph::plot.igraph(ig4,layout=layout5,edge.size=0.001 ,vertex.size=(betweenness(ig4)/10),vertex.color=rainbow(7,alpha=0.3))
+dev.off()
+igraph::plot.igraph(ig5,edge.arrow.size=0.1 ,vertex.label.dist=0,layout=layout5,edge.size=0.001 ,vertex.size=5*log(betweenness(ig5)),vertex.color=rainbow(7,alpha=0.3))
 dev.off()
 
-
-
 plot(ig4,edge.arrow.size=0.1 ,vertex.label.dist=0,layout=layout5,vertex.color=rainbow(7,alpha=0.3),edge.arrow.mode = "-") 
-
 
 
 
@@ -464,4 +465,8 @@ V(ig4)$color<-mem.col[V(ig4)$member]
 dev.off()
 pdf("graphs\\ig4withlayout.pdf") 
 plot(ig4,layout=layout5,vertex.color=V(ig4)$color,vertex.label=V(ig4)$label,vertex.size=V(ig4)$size,edge.arrow.mode = "-")  
+
 dev.off() 
+
+
+touhou <- paste(stklist,sep = "",".sh")
